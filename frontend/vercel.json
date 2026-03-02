@@ -1,17 +1,7 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["dist/**"]
-      }
-    }
-  ],
- "rewrites": [
-    {
-       "source": "/(.*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
