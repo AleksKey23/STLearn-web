@@ -31,6 +31,11 @@
       currentPage = 'testing';
     });
 
+    // Обработка маршрута /mainbar
+    page('/mainbar', () => {
+      currentPage = 'home';
+    });
+
     // Запуск маршрутизатора
     page.start();
   });
