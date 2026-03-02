@@ -14,55 +14,76 @@
   }
 
   async function handleSubmit(event) {
-      event.preventDefault();
-      error = '';
-  
-      // Расширенная валидация данных формы
-      if (!username || !username.trim()) {
-        error = 'Пожалуйста, введите логин';
-        return;
-      }
-      
-      if (!password || !password.trim()) {
-        error = 'Пожалуйста, введите пароль';
-        return;
-      }
-      
-      // Проверка длины логина и пароля
-      if (username.trim().length < 3) {
-        error = 'Логин должен содержать не менее 3 символов';
-        return;
-      }
-      
-      if (password.length < 4) {
-        error = 'Пароль должен содержать не менее 4 символов';
-        return;
-      }
-  
-      try {
+    event.preventDefault();
+    error = '';
+
+    // Расширенная валидация данных формы
+    if (!username || !username.trim()) {
+      error = 'Пожалуйста, введите логин';
+      return;
+    }
+    
+    if (!password || !password.trim()) {
+      error = 'Пожалуйста, введите пароль';
+      return;
+    }
+    
+    // Проверка длины логина и пароля
+    if (username.trim().length < 3) {
+      error = 'Логин должен содержать не менее 3 символов';
+      return;
+    }
+    
+    if (password.length < 4) {
+      error = 'Пароль должен содержать не менее 4 символов';
+      return;
+    }
+
+    try {
+      // Отправляем запрос на сервер для проверки учетных данных
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: username.trim(), password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Успешная аутентификация
+        // Получаем информацию о пользователе из токена или отдельным запросом
+        // Для упрощения предположим, что сервер возвращает роль пользователя
+        // В реальной реализации можно декодировать JWT токен или сделать дополнительный запрос
+        
+        // Проверяем, является ли пользователь администратором
         checkAdminStatus();
-  
         const role = isAdmin ? 'admin' : 'student';
+        
         const user = { username: username.trim(), role };
-  
-        // Новый единый объект пользователя
+
+        // Сохраняем информацию о пользователе в localStorage
         localStorage.setItem('user', JSON.stringify(user));
-  
-        // Старые ключи — на всякий случай, если где‑то ещё используются
         localStorage.setItem('currentUser', username.trim());
         localStorage.setItem('userRole', role);
         localStorage.setItem('isAuthenticated', 'true');
-  
+
+        // Перенаправляем пользователя на соответствующую страницу
         if (isAdmin) {
-                  page.show('/admin', null, false);
-                } else {
-                  page.show('/mainbar', null, false);
-                }
-      } catch (e) {
-        console.error('Ошибка при работе с localStorage или навигации:', e);
-        error = 'Произошла ошибка при попытке входа. Попробуйте позже.';
+          page.show('/admin', null, false);
+        } else {
+          page.show('/mainbar', null, false);
+        }
+      } else {
+        // Ошибка аутентификации
+        error = data.error || 'Неверный логин или пароль';
       }
+    } catch (e) {
+      console.error('Ошибка при попытке входа:', e);
+      error = 'Произошла ошибка при попытке входа. Попробуйте позже.';
     }
+  }
 
   async function handleAdminButtonClick() {
     if (isAdmin) {
