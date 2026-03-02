@@ -3,6 +3,7 @@
   import page from 'page';
   import { lecturesStore, loadLecturesFromLocalStorage } from '../stores.js';
   import { getTestCompletion } from '../completed.js';
+  import config from '../config.js';
 
   let isEditing = false;
   let surname = '';
@@ -162,7 +163,7 @@
       position
     };
 
-    const response = await fetch('/api/user/profile', {
+    const response = await fetch(`${config.API_BASE_URL}/api/user/profile`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -193,7 +194,7 @@
 
   async function loadUserData() {
   try {
-    const response = await fetch('/api/user/profile');
+    const response = await fetch(`${config.API_BASE_URL}/api/user/profile`);
 
     if (response.ok) {
       const userData = await response.json();
