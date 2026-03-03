@@ -1,8 +1,11 @@
 <script>
+import Index from './routes/index.svelte';
+let currentPage = Index;
   import page from 'page';
 
+
   // Импорты компонентов
-  import Index from './routes/index.svelte';
+  
   import Admin from './routes/admin.svelte';
   import Lectures from './routes/lectures.svelte';
   import Mainbar from './routes/mainbar.svelte';
@@ -15,9 +18,7 @@
   import LecSIZ from './routes/lec-siz.svelte';
   import TestTemplate from './routes/test-template/test-template.svelte';
 
-  // Делаем currentPage реактивным
-  let currentPage = Index;
-
+  
   function getUser() {
     const raw = localStorage.getItem('user');
     if (raw) {
