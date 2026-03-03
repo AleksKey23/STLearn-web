@@ -43,7 +43,7 @@
   }
 
   function goToMainbar() {
-    page('/');
+    page('/mainbar');
   }
 
 </script>
