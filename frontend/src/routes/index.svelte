@@ -42,7 +42,7 @@
 
     try {
       // Отправляем запрос на сервер для проверки учетных данных
-      const response = await fetch('/proxy/login', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
