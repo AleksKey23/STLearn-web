@@ -1,5 +1,6 @@
 <script>
   import page from 'page';
+  import config from '../config.js';
 
   let username = '';
   let password = '';
@@ -41,7 +42,7 @@
 
     try {
       // Отправляем запрос на сервер для проверки учетных данных
-      const response = await fetch('/api/login', {
+      const response = await fetch(`${config.API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,8 +81,8 @@
         error = data.error || 'Неверный логин или пароль';
       }
     } catch (e) {
-      console.error('Неверный логин или пароль.', e);
-      error = 'Неверный логин или пароль.';
+      console.error('Ошибка при попытке входа:', e);
+      error = 'Произошла ошибка при попытке входа. Попробуйте позже.';
     }
   }
 
