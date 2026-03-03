@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://w9774819.beget.tech/api/"
+      "destination": "http://w9774819.beget.tech*"
     }
   ]
 }
