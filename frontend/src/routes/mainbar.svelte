@@ -15,10 +15,6 @@
   let isSidebarVisible = false;
 
   onMount(() => {
-    page('/', () => {
-      currentPage = 'home';
-    });
-
     page('/profile', () => {
       currentPage = 'profile';
     });
@@ -31,7 +27,6 @@
       currentPage = 'testing';
     });
 
-    // Обработка маршрута /mainbar
     page('/mainbar', () => {
       currentPage = 'home';
     });
