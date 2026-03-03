@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://45.144.178.89:5000"
+      "destination": "http://w9774819.beget.tech/api/"
     }
   ]
 }
