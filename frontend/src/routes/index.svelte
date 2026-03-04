@@ -1,38 +1,26 @@
-<script>
+script>
   import page from 'page';
-  import config from '../config.js';
+  // import config from '../config.js'; // Раскомментируйте, если используете
 
   let username = '';
   let password = '';
-  let role = 'student'; // Убрали isAdmin, теперь используем role
   let error = '';
 
-  // Переопределили вычисляемые свойства через role
-  $: adminBtnClasses = role === 'admin' ? 'admin-btn active' : 'admin-btn';
-  $: adminHintDisplay = role === 'admin' ? 'block' : 'none';
+  // 1. Реактивно определяем, пытается ли пользователь войти как админ
+  // Кнопка станет красной сразу, как только введут "admin"
+  $: isEnteringAdmin = username.trim().toLowerCase() === 'admin';
+
+  // 2. Классы и стили зависят от того, что введено в поле логина
+  $: adminBtnClasses = isEnteringAdmin ? 'admin-btn active' : 'admin-btn';
+  $: adminHintDisplay = isEnteringAdmin ? 'block' : 'none';
 
   async function handleSubmit(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     error = '';
 
-    // Расширенная валидация данных формы (без изменений)
-    if (!username || !username.trim()) {
-      error = 'Пожалуйста, введите логин';
-      return;
-    }
-    
-    if (!password || !password.trim()) {
-      error = 'Пожалуйста, введите пароль';
-      return;
-    }
-    
-    if (username.trim().length < 3) {
-      error = 'Логин должен содержать не менее 3 символов';
-      return;
-    }
-    
-    if (password.length < 4) {
-      error = 'Пароль должен содержать не менее 4 символов';
+    // Валидация
+    if (!username.trim() || !password.trim()) {
+      error = 'Заполните все поля';
       return;
     }
 
@@ -46,19 +34,15 @@
       const data = await response.json();
 
       if (response.ok) {
-        // Успешная аутентификация
-        // Определяем роль на основе данных сервера
-        role = data.role || 'student'; // Если роль не указана — по умолчанию 'student'
+        // Сервер проверил пароль по хэшу и вернул роль (admin или student)
+        const role = data.role || 'student';
 
-        const user = { username: username.trim(), role };
-
-        // Сохраняем информацию в localStorage
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('currentUser', username.trim());
+        // Сохраняем данные в localStorage
+        localStorage.setItem('user', JSON.stringify({ username: username.trim(), role }));
         localStorage.setItem('userRole', role);
         localStorage.setItem('isAuthenticated', 'true');
 
-        // Перенаправление зависит от роли
+        // 3. Переход с правильным dispatch (без третьего аргумента false)
         if (role === 'admin') {
           page.show('/admin');
         } else {
@@ -68,28 +52,14 @@
         error = data.error || 'Неверный логин или пароль';
       }
     } catch (e) {
-      console.error('Ошибка при попытке входа:', e);
-      error = 'Произошла ошибка при попытке входа. Попробуйте позже.';
+      console.error('Ошибка входа:', e);
+      error = 'Ошибка соединения с сервером.';
     }
   }
 
-  async function handleAdminButtonClick() {
-    try {
-      // Упростили логику: сразу задаём роль 'admin'
-      const user = { username: 'admin', role: 'admin' };
-
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('currentUser', 'admin');
-      localStorage.setItem('userRole', 'admin');
-      localStorage.setItem('isAuthenticated', 'true');
-
-      role = 'admin'; // Обновляем локальную переменную role
-
-      page.show('/admin');
-    } catch (e) {
-      console.error('Ошибка при работе с localStorage или навигации (Admin Button):', e);
-      error = 'Произошла ошибка при попытке входа в админ‑панель.';
-    }
+  // Для красной кнопки используем ту же логику отправки, что и для синей
+  function handleAdminButtonClick() {
+    handleSubmit();
   }
 </script>
 
@@ -105,9 +75,9 @@
         <input
           type="text"
           id="username"
-          name="username"
           placeholder="Введите ваш логин"
           bind:value={username}
+          autocomplete="username" 
           required
         />
       </div>
@@ -116,9 +86,9 @@
         <input
           type="password"
           id="password"
-          name="password"
           placeholder="Введите ваш пароль"
           bind:value={password}
+          autocomplete="current-password"
           required
         />
       </div>
@@ -127,25 +97,36 @@
         <div class="error-message">{error}</div>
       {/if}
 
-      <button type="submit" class="login-btn">Войти</button>
+      <!-- Синяя кнопка активна только для обычных юзеров -->
+      <button 
+        type="submit" 
+        class="login-btn" 
+        disabled={isEnteringAdmin}
+      >
+        Войти
+      </button>
+
+      <!-- Красная кнопка активна только если логин "admin" -->
       <button
         type="button"
         class={adminBtnClasses}
-        id="adminBtn"
         on:click={handleAdminButtonClick}
-        disabled={role !== 'admin'}
+        disabled={!isEnteringAdmin}
       >
         🛡️ Вход администратора
       </button>
-      <div id="adminHint" class="admin-hint" style:display={adminHintDisplay}>
+
+      <div class="admin-hint" style:display={adminHintDisplay}>
         Администратор: вы ввели данные для входа в админ‑панель.
       </div>
     </form>
+
     <div class="footer">
       © 2026г. STLearn.
     </div>
   </div>
 </div>
+
 
 
 <style>
