@@ -10,10 +10,6 @@
   $: adminBtnClasses = isAdmin ? 'admin-btn active' : 'admin-btn';
   $: adminHintDisplay = isAdmin ? 'block' : 'none';
 
-  function checkAdminStatus() {
-    isAdmin = (username === 'admin' && password === 'admin123');
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
     error = '';
@@ -117,7 +113,6 @@
           name="username"
           placeholder="Введите ваш логин"
           bind:value={username}
-          on:input={checkAdminStatus}
           required
         />
       </div>
@@ -129,7 +124,6 @@
           name="password"
           placeholder="Введите ваш пароль"
           bind:value={password}
-          on:input={checkAdminStatus}
           required
         />
       </div>
