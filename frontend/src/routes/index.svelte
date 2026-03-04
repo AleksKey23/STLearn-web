@@ -15,7 +15,9 @@ script>
   $: adminHintDisplay = isEnteringAdmin ? 'block' : 'none';
 
   async function handleSubmit(event) {
-    if (event) event.preventDefault();
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
     error = '';
 
     // Валидация
