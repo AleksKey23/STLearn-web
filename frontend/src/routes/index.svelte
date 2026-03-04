@@ -1,6 +1,6 @@
 script>
   import page from 'page';
-  // import config from '../config.js'; // Раскомментируйте, если используете
+  import config from '../config.js'; 
 
   let username = '';
   let password = '';
@@ -246,6 +246,11 @@ script>
     background: linear-gradient(135deg, #0066cc, #004499);
   }
 
+.login-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
   .admin-btn {
     width: 100%;
     padding: 14px;
@@ -264,27 +269,15 @@ script>
     opacity: 0.7;
   }
 
-  /* Классы для активного состояния админ‑кнопки */
   .admin-btn.active {
     opacity: 1;
     background: linear-gradient(135deg, #dc3545, #c82333);
   }
 
-
   .admin-btn.active:hover {
     background: linear-gradient(135deg, #c82333, #a71e2a);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-  }
-
-  /* Стиль для неактивной кнопки, чтобы она выглядела серой */
-  .admin-btn:disabled {
-    background: #ccc;
-    color: #666;
-    cursor: not-allowed;
-    opacity: 0.5;
-    transform: none;
-    box-shadow: none;
   }
 
   .footer {
