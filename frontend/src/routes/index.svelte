@@ -47,7 +47,7 @@
 
       if (response.ok) {
         // Успешная аутентификация
-        // Определяем роль на основе данных сервера, а не локальной переменной
+        // Определяем роль на основе данных сервера
         role = data.role || 'student'; // Если роль не указана — по умолчанию 'student'
 
         const user = { username: username.trim(), role };
@@ -60,9 +60,9 @@
 
         // Перенаправление зависит от роли
         if (role === 'admin') {
-          page.show('/admin', null, false);
+          page.show('/admin');
         } else {
-          page.show('/mainbar', null, false);
+          page.show('/mainbar');
         }
       } else {
         error = data.error || 'Неверный логин или пароль';
@@ -85,7 +85,7 @@
 
       role = 'admin'; // Обновляем локальную переменную role
 
-      page.show('/admin', null, false);
+      page.show('/admin');
     } catch (e) {
       console.error('Ошибка при работе с localStorage или навигации (Admin Button):', e);
       error = 'Произошла ошибка при попытке входа в админ‑панель.';
