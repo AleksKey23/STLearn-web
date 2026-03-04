@@ -1,4 +1,4 @@
-script>
+<script>
   import page from 'page';
   import config from '../config.js'; 
 
