@@ -15,14 +15,19 @@ script>
   $: adminHintDisplay = isEnteringAdmin ? 'block' : 'none';
 
   async function handleSubmit(event) {
-    if (event && typeof event.preventDefault === 'function') {
-      event.preventDefault();
+    // 1. Проверяем наличие event максимально просто
+    if (event) {
+      if (typeof event.preventDefault === 'function') {
+        event.preventDefault();
+      }
     }
+    
     error = '';
 
     // Валидация
-    if (!username.trim() || !password.trim()) {
-      error = 'Заполните все поля';
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername || !password.trim()) {
+      error = 'Пожалуйста, заполните все поля';
       return;
     }
 
@@ -30,22 +35,20 @@ script>
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password })
+        body: JSON.stringify({ username: trimmedUsername, password: password })
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Сервер проверил пароль по хэшу и вернул роль (admin или student)
-        const role = data.role || 'student';
+        const userRole = data.role || 'student';
+        const user = { username: trimmedUsername, role: userRole };
 
-        // Сохраняем данные в localStorage
-        localStorage.setItem('user', JSON.stringify({ username: username.trim(), role }));
-        localStorage.setItem('userRole', role);
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('userRole', userRole);
         localStorage.setItem('isAuthenticated', 'true');
 
-        // 3. Переход с правильным dispatch (без третьего аргумента false)
-        if (role === 'admin') {
+        if (userRole === 'admin') {
           page.show('/admin');
         } else {
           page.show('/mainbar');
@@ -54,7 +57,7 @@ script>
         error = data.error || 'Неверный логин или пароль';
       }
     } catch (e) {
-      console.error('Ошибка входа:', e);
+      console.error('Login error:', e);
       error = 'Ошибка соединения с сервером.';
     }
   }
