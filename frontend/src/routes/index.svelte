@@ -133,7 +133,7 @@
         class={adminBtnClasses}
         id="adminBtn"
         on:click={handleAdminButtonClick}
-        disabled={!isAdmin}
+        disabled={role !== 'admin'}
       >
         🛡️ Вход администратора
       </button>
