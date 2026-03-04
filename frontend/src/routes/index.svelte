@@ -4,17 +4,18 @@
 
   let username = '';
   let password = '';
-  let isAdmin = false;
+  let role = 'student'; // Убрали isAdmin, теперь используем role
   let error = '';
 
-  $: adminBtnClasses = isAdmin ? 'admin-btn active' : 'admin-btn';
-  $: adminHintDisplay = isAdmin ? 'block' : 'none';
+  // Переопределили вычисляемые свойства через role
+  $: adminBtnClasses = role === 'admin' ? 'admin-btn active' : 'admin-btn';
+  $: adminHintDisplay = role === 'admin' ? 'block' : 'none';
 
   async function handleSubmit(event) {
     event.preventDefault();
     error = '';
 
-    // Расширенная валидация данных формы
+    // Расширенная валидация данных формы (без изменений)
     if (!username || !username.trim()) {
       error = 'Пожалуйста, введите логин';
       return;
@@ -25,7 +26,6 @@
       return;
     }
     
-    // Проверка длины логина и пароля
     if (username.trim().length < 3) {
       error = 'Логин должен содержать не менее 3 символов';
       return;
@@ -37,40 +37,34 @@
     }
 
     try {
-      // Отправляем запрос на сервер для проверки учетных данных
       const response = await fetch('/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: username.trim(), password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username.trim(), password })
       });
 
       const data = await response.json();
 
       if (response.ok) {
         // Успешная аутентификация
-       
-        // Проверяем, является ли пользователь администратором
-        checkAdminStatus();
-        const role = isAdmin ? 'admin' : 'student';
-        
+        // Определяем роль на основе данных сервера, а не локальной переменной
+        role = data.role || 'student'; // Если роль не указана — по умолчанию 'student'
+
         const user = { username: username.trim(), role };
 
-        // Сохраняем информацию о пользователе в localStorage
+        // Сохраняем информацию в localStorage
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('currentUser', username.trim());
         localStorage.setItem('userRole', role);
         localStorage.setItem('isAuthenticated', 'true');
 
-        // Перенаправляем пользователя на соответствующую страницу
-        if (isAdmin) {
+        // Перенаправление зависит от роли
+        if (role === 'admin') {
           page.show('/admin', null, false);
         } else {
           page.show('/mainbar', null, false);
         }
       } else {
-        // Ошибка аутентификации
         error = data.error || 'Неверный логин или пароль';
       }
     } catch (e) {
@@ -80,20 +74,21 @@
   }
 
   async function handleAdminButtonClick() {
-    if (isAdmin) {
-      try {
-        const user = { username: 'admin', role: 'admin' };
+    try {
+      // Упростили логику: сразу задаём роль 'admin'
+      const user = { username: 'admin', role: 'admin' };
 
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('currentUser', 'admin');
-        localStorage.setItem('userRole', 'admin');
-        localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('currentUser', 'admin');
+      localStorage.setItem('userRole', 'admin');
+      localStorage.setItem('isAuthenticated', 'true');
 
-        page.show('/admin', null, false);
-      } catch (e) {
-        console.error('Ошибка при работе с localStorage или навигации (Admin Button):', e);
-        error = 'Произошла ошибка при попытке входа в админ‑панель.';
-      }
+      role = 'admin'; // Обновляем локальную переменную role
+
+      page.show('/admin', null, false);
+    } catch (e) {
+      console.error('Ошибка при работе с localStorage или навигации (Admin Button):', e);
+      error = 'Произошла ошибка при попытке входа в админ‑панель.';
     }
   }
 </script>
