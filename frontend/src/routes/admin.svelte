@@ -89,9 +89,13 @@
 
   // Инициализация при загрузке
   onMount(() => {
+    async function refreshUsers() {
+    const response = await fetch('/api/users');
+    const data = await response.json();
+    // Обновляем стор данными из БД
+    usersStore.set(data); }
     loadLecturesFromLocalStorage();
     loadTestsFromLocalStorage();
-    loadActivityFromLocalStorage();
     calculateStats();
   });
 </script>
